@@ -149,11 +149,15 @@
         <div class="poster-container" ref="posterRef" :style="bgImageStyle">
           <!-- 海报头部 -->
           <div class="poster-header">
-            <h1 class="poster-title">中部BD品牌&连锁客户新签荣誉榜</h1>
-            <div class="poster-date">截止日期：{{ signDate }}</div>
-            <div class="top-logo" v-if="topLogo.length > 0">
-              <img :src="topLogo[0].url" alt="top-logo" class="top-logo-img" />
+            <div class="title-container">
+              <div class="title-with-logo">
+                <h1 class="poster-title">中部BD品牌&连锁客户新签荣誉榜</h1>
+              </div>
+              <div class="top-logo" v-if="topLogo.length > 0">
+                <img :src="topLogo[0].url" alt="top-logo" class="top-logo-img" />
+              </div>
             </div>
+            <div class="poster-date">截止日期：{{ signDate }}</div>
           </div>
           
           <!-- 海报主体 -->
@@ -490,26 +494,40 @@ const clearBottomLogo = () => {
   position: relative;
 }
 
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.title-with-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.top-logo {
+  margin-left: auto;
+}
+
 .poster-title {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .poster-date {
-  position: absolute;
-  top: 40px;
-  right: 120px;
   font-size: 14px;
   opacity: 0.9;
+  white-space: nowrap;
 }
 
 /* 顶部Logo样式 */
 .top-logo {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   width: 80px;
   height: 80px;
   display: flex;
@@ -594,7 +612,6 @@ const clearBottomLogo = () => {
 }
 
 .brand-item {
-  background: rgba(255, 255, 255, 0.1);
   padding: 15px;
   border-radius: 6px;
   display: flex;
@@ -625,7 +642,6 @@ const clearBottomLogo = () => {
 }
 
 .coop-brand {
-  background: rgba(255, 255, 255, 0.1);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
