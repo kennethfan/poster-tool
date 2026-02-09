@@ -99,6 +99,44 @@
           <el-button type="danger" @click="clearBgImage" v-if="bgImage.length > 0">清空背景图</el-button>
         </div>
         
+        <!-- 顶部Logo上传 -->
+        <div class="control-section">
+          <h3>顶部Logo管理</h3>
+          <el-upload
+            v-model:file-list="topLogo"
+            action="#"
+            :auto-upload="false"
+            :on-change="handleTopLogoChange"
+            :before-remove="handleTopLogoRemove"
+            :limit="1"
+            :on-exceed="handleTopLogoExceed"
+            list-type="picture"
+          >
+            <el-icon><i-ep-plus /></el-icon>
+            <div class="el-upload__text">上传顶部Logo</div>
+          </el-upload>
+          <el-button type="danger" @click="clearTopLogo" v-if="topLogo.length > 0">清空顶部Logo</el-button>
+        </div>
+        
+        <!-- 底部Logo上传 -->
+        <div class="control-section">
+          <h3>底部Logo管理</h3>
+          <el-upload
+            v-model:file-list="bottomLogo"
+            action="#"
+            :auto-upload="false"
+            :on-change="handleBottomLogoChange"
+            :before-remove="handleBottomLogoRemove"
+            :limit="1"
+            :on-exceed="handleBottomLogoExceed"
+            list-type="picture"
+          >
+            <el-icon><i-ep-plus /></el-icon>
+            <div class="el-upload__text">上传底部Logo</div>
+          </el-upload>
+          <el-button type="danger" @click="clearBottomLogo" v-if="bottomLogo.length > 0">清空底部Logo</el-button>
+        </div>
+        
         <!-- 操作按钮 -->
         <div class="control-section">
           <el-button type="success" @click="generatePoster" class="generate-btn">生成海报</el-button>
@@ -113,6 +151,9 @@
           <div class="poster-header">
             <h1 class="poster-title">中部BD品牌&连锁客户新签荣誉榜</h1>
             <div class="poster-date">截止日期：{{ signDate }}</div>
+            <div class="top-logo" v-if="topLogo.length > 0">
+              <img :src="topLogo[0].url" alt="top-logo" class="top-logo-img" />
+            </div>
           </div>
           
           <!-- 海报主体 -->
@@ -169,7 +210,10 @@
               </div>
               <div v-if="coopBrands.length === 0" class="coop-empty">暂无合作商家</div>
             </div>
-            <div class="poster-logo">顺丰同城</div>
+            <div class="poster-logo">
+              <img v-if="bottomLogo.length > 0" :src="bottomLogo[0].url" alt="bottom-logo" class="bottom-logo-img" />
+              <span v-else>顺丰同城</span>
+            </div>
           </div>
         </div>
       </div>
@@ -199,6 +243,12 @@ const brandImages = ref<UploadFile[]>([])
 
 // 背景图片
 const bgImage = ref<UploadFile[]>([])
+
+// 顶部Logo
+const topLogo = ref<UploadFile[]>([])
+
+// 底部Logo
+const bottomLogo = ref<UploadFile[]>([])
 
 // 合作商家
 const coopBrands = ref<string[]>([])
@@ -329,6 +379,48 @@ const handleBgImageExceed = () => {
 const clearBgImage = () => {
   bgImage.value = []
 }
+
+// 处理顶部Logo上传
+const handleTopLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
+  topLogo.value = fileList
+}
+
+// 处理顶部Logo删除
+const handleTopLogoRemove = (file: UploadFile, fileList: UploadFile[]) => {
+  topLogo.value = fileList
+  return true
+}
+
+// 处理顶部Logo超出限制
+const handleTopLogoExceed = () => {
+  alert('最多上传1张顶部Logo图片')
+}
+
+// 清空顶部Logo
+const clearTopLogo = () => {
+  topLogo.value = []
+}
+
+// 处理底部Logo上传
+const handleBottomLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
+  bottomLogo.value = fileList
+}
+
+// 处理底部Logo删除
+const handleBottomLogoRemove = (file: UploadFile, fileList: UploadFile[]) => {
+  bottomLogo.value = fileList
+  return true
+}
+
+// 处理底部Logo超出限制
+const handleBottomLogoExceed = () => {
+  alert('最多上传1张底部Logo图片')
+}
+
+// 清空底部Logo
+const clearBottomLogo = () => {
+  bottomLogo.value = []
+}
 </script>
 
 <style scoped>
@@ -408,9 +500,39 @@ const clearBgImage = () => {
 .poster-date {
   position: absolute;
   top: 40px;
-  right: 20px;
+  right: 120px;
   font-size: 14px;
   opacity: 0.9;
+}
+
+/* 顶部Logo样式 */
+.top-logo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.top-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* 底部Logo样式 */
+.bottom-logo-img {
+  max-width: 120px;
+  max-height: 40px;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 .poster-body {
