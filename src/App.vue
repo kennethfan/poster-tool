@@ -515,8 +515,6 @@ const clearBottomLogo = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
   padding: 10px;
 }
 
@@ -524,7 +522,7 @@ const clearBottomLogo = () => {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 50%;
 }
 
 /* 底部Logo样式 */
