@@ -154,7 +154,7 @@
                 <h1 class="poster-title">中部BD品牌&连锁客户新签荣誉榜</h1>
               </div>
               <div class="top-logo" v-if="topLogo.length > 0">
-                <img :src="topLogo[0].url" alt="top-logo" class="top-logo-img" />
+                <img :src="topLogo[0]?.url" alt="top-logo" class="top-logo-img" />
               </div>
             </div>
             <div class="poster-date">截止日期：{{ signDate }}</div>
@@ -215,7 +215,7 @@
               <div v-if="coopBrands.length === 0" class="coop-empty">暂无合作商家</div>
             </div>
             <div class="poster-logo">
-              <img v-if="bottomLogo.length > 0" :src="bottomLogo[0].url" alt="bottom-logo" class="bottom-logo-img" />
+              <img v-if="bottomLogo.length > 0" :src="bottomLogo[0]?.url" alt="bottom-logo" class="bottom-logo-img" />
               <span v-else>顺丰同城</span>
             </div>
           </div>
@@ -308,7 +308,7 @@ const clearRankData = () => {
 }
 
 // 处理品牌图片上传
-const handleBrandImageChange = (file: UploadFile, fileList: UploadFile[]) => {
+const handleBrandImageChange = (_file: UploadFile, fileList: UploadFile[]) => {
   brandImages.value = fileList
 }
 
@@ -365,7 +365,7 @@ const addDefaultCoopBrands = () => {
 }
 
 // 处理背景图上传
-const handleBgImageChange = (file: UploadFile, fileList: UploadFile[]) => {
+const handleBgImageChange = (_file: UploadFile, fileList: UploadFile[]) => {
   bgImage.value = fileList
 }
 
@@ -386,7 +386,7 @@ const clearBgImage = () => {
 }
 
 // 处理顶部Logo上传
-const handleTopLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
+const handleTopLogoChange = (_file: UploadFile, fileList: UploadFile[]) => {
   topLogo.value = fileList
 }
 
@@ -407,7 +407,7 @@ const clearTopLogo = () => {
 }
 
 // 处理底部Logo上传
-const handleBottomLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
+const handleBottomLogoChange = (_file: UploadFile, fileList: UploadFile[]) => {
   bottomLogo.value = fileList
 }
 
