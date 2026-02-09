@@ -146,7 +146,7 @@
       
       <!-- 海报预览区域 -->
       <div class="poster-preview">
-        <div class="poster-container" ref="posterRef" :style="bgImageStyle">
+        <div class="poster-container" :style="bgImageStyle">
           <!-- 海报头部 -->
           <div class="poster-header">
             <div class="title-container">
@@ -227,7 +227,6 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
 import type { UploadFile } from 'element-plus'
 
 // 签单日期
@@ -262,7 +261,7 @@ const coopForm = reactive({
 
 // 背景图样式
 const bgImageStyle = computed(() => {
-  if (bgImage.value.length > 0 && bgImage.value[0].url) {
+  if (bgImage.value.length > 0 && bgImage.value[0]?.url) {
     return {
       background: `url(${bgImage.value[0].url}) center/cover no-repeat`,
       backgroundColor: '#c8102e'
@@ -272,9 +271,6 @@ const bgImageStyle = computed(() => {
     background: 'linear-gradient(135deg, #c8102e 0%, #8b0000 100%)'
   }
 })
-
-// 海报容器引用
-const posterRef = ref<HTMLElement>()
 
 // 初始化日期为当天
 onMounted(() => {
@@ -317,7 +313,7 @@ const handleBrandImageChange = (file: UploadFile, fileList: UploadFile[]) => {
 }
 
 // 处理品牌图片删除
-const handleBrandImageRemove = (file: UploadFile, fileList: UploadFile[]) => {
+const handleBrandImageRemove = (_file: UploadFile, fileList: UploadFile[]) => {
   brandImages.value = fileList
   return true
 }
@@ -325,6 +321,11 @@ const handleBrandImageRemove = (file: UploadFile, fileList: UploadFile[]) => {
 // 处理品牌图片超出限制
 const handleBrandImageExceed = () => {
   alert('最多上传12张品牌图片')
+}
+
+// 清空品牌图片
+const clearBrandImages = () => {
+  brandImages.value = []
 }
 
 // 添加合作商家
@@ -369,7 +370,7 @@ const handleBgImageChange = (file: UploadFile, fileList: UploadFile[]) => {
 }
 
 // 处理背景图删除
-const handleBgImageRemove = (file: UploadFile, fileList: UploadFile[]) => {
+const handleBgImageRemove = (_file: UploadFile, fileList: UploadFile[]) => {
   bgImage.value = fileList
   return true
 }
@@ -390,7 +391,7 @@ const handleTopLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
 }
 
 // 处理顶部Logo删除
-const handleTopLogoRemove = (file: UploadFile, fileList: UploadFile[]) => {
+const handleTopLogoRemove = (_file: UploadFile, fileList: UploadFile[]) => {
   topLogo.value = fileList
   return true
 }
@@ -411,7 +412,7 @@ const handleBottomLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
 }
 
 // 处理底部Logo删除
-const handleBottomLogoRemove = (file: UploadFile, fileList: UploadFile[]) => {
+const handleBottomLogoRemove = (_file: UploadFile, fileList: UploadFile[]) => {
   bottomLogo.value = fileList
   return true
 }
