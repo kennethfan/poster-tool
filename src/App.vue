@@ -140,7 +140,6 @@
         <!-- 操作按钮 -->
         <div class="control-section">
           <el-button type="success" @click="generatePoster" class="generate-btn">生成海报</el-button>
-          <el-button type="info" @click="previewPoster">预览海报</el-button>
         </div>
       </div>
       
@@ -345,13 +344,32 @@ const clearCoopBrands = () => {
 }
 
 // 生成海报
-const generatePoster = () => {
-  alert('海报生成功能开发中...')
-}
+const generatePoster = async () => {
+  try {
+    const posterElement = document.querySelector('.poster-container')
+    if (!posterElement) {
+      alert('未找到海报元素')
+      return
+    }
 
-// 预览海报
-const previewPoster = () => {
-  alert('海报预览功能开发中...')
+    // 使用html2canvas库将海报转换为图片
+    const html2canvas = (await import('html2canvas')).default
+    const canvas = await html2canvas(posterElement as HTMLElement, {
+      scale: 2, // 提高图片清晰度
+      useCORS: true, // 允许跨域图片
+      logging: false
+    })
+
+    // 将canvas转换为图片并下载
+    const dataUrl = canvas.toDataURL('image/png')
+    const link = document.createElement('a')
+    link.href = dataUrl
+    link.download = `poster-${new Date().toISOString().slice(0, 10)}.png`
+    link.click()
+  } catch (error) {
+    console.error('生成海报失败:', error)
+    alert('生成海报失败，请重试')
+  }
 }
 
 // 添加默认合作商家
