@@ -80,6 +80,63 @@
           </el-form>
         </div>
         
+        <!-- 背景图上传 -->
+        <div class="control-section">
+          <h3>背景图管理</h3>
+          <el-upload
+            v-model:file-list="bgImage"
+            action="#"
+            :auto-upload="false"
+            :on-change="handleBgImageChange"
+            :before-remove="handleBgImageRemove"
+            :limit="1"
+            :on-exceed="handleBgImageExceed"
+            list-type="picture"
+          >
+            <el-icon><i-ep-plus /></el-icon>
+            <div class="el-upload__text">上传背景图</div>
+          </el-upload>
+          <el-button type="danger" @click="clearBgImage" v-if="bgImage.length > 0">清空背景图</el-button>
+        </div>
+        
+        <!-- 顶部Logo上传 -->
+        <div class="control-section">
+          <h3>顶部Logo管理</h3>
+          <el-upload
+            v-model:file-list="topLogo"
+            action="#"
+            :auto-upload="false"
+            :on-change="handleTopLogoChange"
+            :before-remove="handleTopLogoRemove"
+            :limit="1"
+            :on-exceed="handleTopLogoExceed"
+            list-type="picture"
+          >
+            <el-icon><i-ep-plus /></el-icon>
+            <div class="el-upload__text">上传顶部Logo</div>
+          </el-upload>
+          <el-button type="danger" @click="clearTopLogo" v-if="topLogo.length > 0">清空顶部Logo</el-button>
+        </div>
+        
+        <!-- 底部Logo上传 -->
+        <div class="control-section">
+          <h3>底部Logo管理</h3>
+          <el-upload
+            v-model:file-list="bottomLogo"
+            action="#"
+            :auto-upload="false"
+            :on-change="handleBottomLogoChange"
+            :before-remove="handleBottomLogoRemove"
+            :limit="1"
+            :on-exceed="handleBottomLogoExceed"
+            list-type="picture"
+          >
+            <el-icon><i-ep-plus /></el-icon>
+            <div class="el-upload__text">上传底部Logo</div>
+          </el-upload>
+          <el-button type="danger" @click="clearBottomLogo" v-if="bottomLogo.length > 0">清空底部Logo</el-button>
+        </div>
+        
         <!-- 操作按钮 -->
         <div class="control-section">
           <el-button type="success" @click="generatePoster" class="generate-btn">生成海报</el-button>
@@ -89,10 +146,17 @@
       
       <!-- 海报预览区域 -->
       <div class="poster-preview">
-        <div class="poster-container" ref="posterRef">
+        <div class="poster-container" ref="posterRef" :style="bgImageStyle">
           <!-- 海报头部 -->
           <div class="poster-header">
-            <h1 class="poster-title">中部BD品牌&连锁客户新签荣誉榜</h1>
+            <div class="title-container">
+              <div class="title-with-logo">
+                <h1 class="poster-title">中部BD品牌&连锁客户新签荣誉榜</h1>
+              </div>
+              <div class="top-logo" v-if="topLogo.length > 0">
+                <img :src="topLogo[0].url" alt="top-logo" class="top-logo-img" />
+              </div>
+            </div>
             <div class="poster-date">截止日期：{{ signDate }}</div>
           </div>
           
@@ -150,7 +214,10 @@
               </div>
               <div v-if="coopBrands.length === 0" class="coop-empty">暂无合作商家</div>
             </div>
-            <div class="poster-logo">顺丰同城</div>
+            <div class="poster-logo">
+              <img v-if="bottomLogo.length > 0" :src="bottomLogo[0].url" alt="bottom-logo" class="bottom-logo-img" />
+              <span v-else>顺丰同城</span>
+            </div>
           </div>
         </div>
       </div>
@@ -159,7 +226,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import type { UploadFile } from 'element-plus'
 
@@ -178,10 +245,32 @@ const rankForm = reactive({
 // 品牌图片
 const brandImages = ref<UploadFile[]>([])
 
+// 背景图片
+const bgImage = ref<UploadFile[]>([])
+
+// 顶部Logo
+const topLogo = ref<UploadFile[]>([])
+
+// 底部Logo
+const bottomLogo = ref<UploadFile[]>([])
+
 // 合作商家
 const coopBrands = ref<string[]>([])
 const coopForm = reactive({
   coopName: ''
+})
+
+// 背景图样式
+const bgImageStyle = computed(() => {
+  if (bgImage.value.length > 0 && bgImage.value[0].url) {
+    return {
+      background: `url(${bgImage.value[0].url}) center/cover no-repeat`,
+      backgroundColor: '#c8102e'
+    }
+  }
+  return {
+    background: 'linear-gradient(135deg, #c8102e 0%, #8b0000 100%)'
+  }
 })
 
 // 海报容器引用
@@ -273,6 +362,69 @@ const addDefaultCoopBrands = () => {
     }
   }
 }
+
+// 处理背景图上传
+const handleBgImageChange = (file: UploadFile, fileList: UploadFile[]) => {
+  bgImage.value = fileList
+}
+
+// 处理背景图删除
+const handleBgImageRemove = (file: UploadFile, fileList: UploadFile[]) => {
+  bgImage.value = fileList
+  return true
+}
+
+// 处理背景图超出限制
+const handleBgImageExceed = () => {
+  alert('最多上传1张背景图')
+}
+
+// 清空背景图
+const clearBgImage = () => {
+  bgImage.value = []
+}
+
+// 处理顶部Logo上传
+const handleTopLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
+  topLogo.value = fileList
+}
+
+// 处理顶部Logo删除
+const handleTopLogoRemove = (file: UploadFile, fileList: UploadFile[]) => {
+  topLogo.value = fileList
+  return true
+}
+
+// 处理顶部Logo超出限制
+const handleTopLogoExceed = () => {
+  alert('最多上传1张顶部Logo图片')
+}
+
+// 清空顶部Logo
+const clearTopLogo = () => {
+  topLogo.value = []
+}
+
+// 处理底部Logo上传
+const handleBottomLogoChange = (file: UploadFile, fileList: UploadFile[]) => {
+  bottomLogo.value = fileList
+}
+
+// 处理底部Logo删除
+const handleBottomLogoRemove = (file: UploadFile, fileList: UploadFile[]) => {
+  bottomLogo.value = fileList
+  return true
+}
+
+// 处理底部Logo超出限制
+const handleBottomLogoExceed = () => {
+  alert('最多上传1张底部Logo图片')
+}
+
+// 清空底部Logo
+const clearBottomLogo = () => {
+  bottomLogo.value = []
+}
 </script>
 
 <style scoped>
@@ -342,19 +494,61 @@ const addDefaultCoopBrands = () => {
   position: relative;
 }
 
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.title-with-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.top-logo {
+  margin-left: auto;
+}
+
 .poster-title {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin: 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .poster-date {
-  position: absolute;
-  top: 10px;
-  right: 20px;
   font-size: 14px;
   opacity: 0.9;
+  white-space: nowrap;
+}
+
+/* 顶部Logo样式 */
+.top-logo {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.top-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+/* 底部Logo样式 */
+.bottom-logo-img {
+  max-width: 120px;
+  max-height: 40px;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 .poster-body {
@@ -418,7 +612,6 @@ const addDefaultCoopBrands = () => {
 }
 
 .brand-item {
-  background: rgba(255, 255, 255, 0.1);
   padding: 15px;
   border-radius: 6px;
   display: flex;
@@ -449,7 +642,6 @@ const addDefaultCoopBrands = () => {
 }
 
 .coop-brand {
-  background: rgba(255, 255, 255, 0.1);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
