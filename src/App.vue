@@ -1,0 +1,524 @@
+<template>
+  <div class="poster-tool-container">
+    <h1 class="app-title">海报小工具</h1>
+    
+    <!-- 海报编辑区域 -->
+    <div class="poster-editor">
+      <!-- 控制区域 -->
+      <div class="control-panel">
+        <!-- 日期设置 -->
+        <div class="control-section">
+          <h3>签单日期设置</h3>
+          <el-date-picker
+            v-model="signDate"
+            type="date"
+            placeholder="选择日期"
+            format="YYYY年MM月DD日"
+            value-format="YYYY年MM月DD日"
+            style="width: 200px"
+          />
+          <el-button type="primary" @click="resetDate">重置为当天</el-button>
+        </div>
+        
+        <!-- 排名数据管理 -->
+        <div class="control-section">
+          <h3>排名数据管理</h3>
+          <el-form :model="rankForm" class="rank-form">
+            <el-form-item label="区域" prop="region">
+              <el-input v-model="rankForm.region" placeholder="请输入区域" />
+            </el-form-item>
+            <el-form-item label="负责人" prop="person">
+              <el-input v-model="rankForm.person" placeholder="请输入负责人" />
+            </el-form-item>
+            <el-form-item label="收入" prop="income">
+              <el-input-number v-model="rankForm.income" :min="0" placeholder="请输入收入" />
+            </el-form-item>
+            <el-form-item label="合作品牌数" prop="brandCount">
+              <el-input-number v-model="rankForm.brandCount" :min="0" placeholder="请输入合作品牌数" />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="addRankData">添加排名数据</el-button>
+              <el-button type="danger" @click="clearRankData" v-if="rankData.length > 0">清空排名数据</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        
+        <!-- 商家图片上传 -->
+        <div class="control-section">
+          <h3>商家图片管理</h3>
+          <el-upload
+            v-model:file-list="brandImages"
+            multiple
+            action="#"
+            :auto-upload="false"
+            :on-change="handleBrandImageChange"
+            :before-remove="handleBrandImageRemove"
+            :limit="12"
+            :on-exceed="handleBrandImageExceed"
+            list-type="picture-card"
+          >
+            <el-icon><i-ep-plus /></el-icon>
+            <div class="el-upload__text">上传图片</div>
+          </el-upload>
+          <el-button type="danger" @click="clearBrandImages" v-if="brandImages.length > 0">清空商家图片</el-button>
+        </div>
+        
+        <!-- 合作商家管理 -->
+        <div class="control-section">
+          <h3>合作商家管理</h3>
+          <el-form :model="coopForm" class="coop-form">
+            <el-form-item label="商家名称" prop="coopName">
+              <el-input v-model="coopForm.coopName" placeholder="请输入商家名称" />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="addCoopBrand">添加合作商家</el-button>
+              <el-button type="danger" @click="clearCoopBrands" v-if="coopBrands.length > 0">清空合作商家</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="info" @click="addDefaultCoopBrands">添加默认合作商家</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        
+        <!-- 操作按钮 -->
+        <div class="control-section">
+          <el-button type="success" @click="generatePoster" class="generate-btn">生成海报</el-button>
+          <el-button type="info" @click="previewPoster">预览海报</el-button>
+        </div>
+      </div>
+      
+      <!-- 海报预览区域 -->
+      <div class="poster-preview">
+        <div class="poster-container" ref="posterRef">
+          <!-- 海报头部 -->
+          <div class="poster-header">
+            <h1 class="poster-title">中部BD品牌&连锁客户新签荣誉榜</h1>
+            <div class="poster-date">截止日期：{{ signDate }}</div>
+          </div>
+          
+          <!-- 海报主体 -->
+          <div class="poster-body">
+            <!-- 左边排名区域 -->
+            <div class="rank-section">
+              <h2 class="section-title">销售排行榜</h2>
+              <div class="rank-table">
+                <div class="rank-header">
+                  <div class="rank-col">区域</div>
+                  <div class="rank-col">负责人</div>
+                  <div class="rank-col">收入</div>
+                  <div class="rank-col">合作品牌数</div>
+                </div>
+                <div 
+                  v-for="(item, index) in rankData" 
+                  :key="index"
+                  class="rank-row"
+                >
+                  <div class="rank-col">{{ item.region }}</div>
+                  <div class="rank-col">{{ item.person }}</div>
+                  <div class="rank-col">{{ item.income }}</div>
+                  <div class="rank-col">{{ item.brandCount }}</div>
+                </div>
+                <div v-if="rankData.length === 0" class="rank-empty">暂无排名数据</div>
+              </div>
+            </div>
+            
+            <!-- 右边品牌区域 -->
+            <div class="brand-section">
+              <h2 class="section-title">合作品牌名单</h2>
+              <div class="brand-grid">
+                <div 
+                  v-for="(image, index) in brandImages" 
+                  :key="index"
+                  class="brand-item"
+                >
+                  <img :src="image.url" alt="brand" class="brand-logo" />
+                </div>
+                <div v-if="brandImages.length === 0" class="brand-empty">暂无品牌图片</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 海报底部 -->
+          <div class="poster-footer">
+            <div class="coop-brands">
+              <div 
+                v-for="(brand, index) in coopBrands" 
+                :key="index"
+                class="coop-brand"
+              >
+                {{ brand }}
+              </div>
+              <div v-if="coopBrands.length === 0" class="coop-empty">暂无合作商家</div>
+            </div>
+            <div class="poster-logo">顺丰同城</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, onMounted } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+import type { UploadFile } from 'element-plus'
+
+// 签单日期
+const signDate = ref('')
+
+// 排名数据
+const rankData = ref<any[]>([])
+const rankForm = reactive({
+  region: '',
+  person: '',
+  income: 0,
+  brandCount: 0
+})
+
+// 品牌图片
+const brandImages = ref<UploadFile[]>([])
+
+// 合作商家
+const coopBrands = ref<string[]>([])
+const coopForm = reactive({
+  coopName: ''
+})
+
+// 海报容器引用
+const posterRef = ref<HTMLElement>()
+
+// 初始化日期为当天
+onMounted(() => {
+  resetDate()
+})
+
+// 重置日期为当天
+const resetDate = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  signDate.value = `${year}年${month}月${day}日`
+}
+
+// 添加排名数据
+const addRankData = () => {
+  if (!rankForm.region || !rankForm.person) {
+    alert('请填写区域和负责人')
+    return
+  }
+  rankData.value.push({ ...rankForm })
+  // 重置表单
+  Object.assign(rankForm, {
+    region: '',
+    person: '',
+    income: 0,
+    brandCount: 0
+  })
+}
+
+// 清空排名数据
+const clearRankData = () => {
+  rankData.value = []
+}
+
+// 处理品牌图片上传
+const handleBrandImageChange = (file: UploadFile, fileList: UploadFile[]) => {
+  brandImages.value = fileList
+}
+
+// 处理品牌图片删除
+const handleBrandImageRemove = (file: UploadFile, fileList: UploadFile[]) => {
+  brandImages.value = fileList
+  return true
+}
+
+// 处理品牌图片超出限制
+const handleBrandImageExceed = () => {
+  alert('最多上传12张品牌图片')
+}
+
+// 添加合作商家
+const addCoopBrand = () => {
+  if (!coopForm.coopName) {
+    alert('请填写商家名称')
+    return
+  }
+  coopBrands.value.push(coopForm.coopName)
+  // 重置表单
+  coopForm.coopName = ''
+}
+
+// 清空合作商家
+const clearCoopBrands = () => {
+  coopBrands.value = []
+}
+
+// 生成海报
+const generatePoster = () => {
+  alert('海报生成功能开发中...')
+}
+
+// 预览海报
+const previewPoster = () => {
+  alert('海报预览功能开发中...')
+}
+
+// 添加默认合作商家
+const addDefaultCoopBrands = () => {
+  const defaultBrands = ['楚湘豫甲，中原称霸，赢战214，中部牛，牛牛牛']
+  for (const brand of defaultBrands) {
+    if (!coopBrands.value.includes(brand)) {
+      coopBrands.value.push(brand)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.poster-tool-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.app-title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.poster-editor {
+  display: flex;
+  gap: 20px;
+}
+
+.control-panel {
+  flex: 1;
+  background: #f5f7fa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08);
+}
+
+.control-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.control-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #303133;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.rank-form, .coop-form {
+  margin-bottom: 15px;
+}
+
+.poster-preview {
+  flex: 2;
+}
+
+.poster-container {
+  width: 100%;
+  background: linear-gradient(135deg, #c8102e 0%, #8b0000 100%);
+  color: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.poster-header {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.poster-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.poster-date {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.poster-body {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.rank-section, .brand-section {
+  flex: 1;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 10px;
+}
+
+.rank-table {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rank-header {
+  display: flex;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 12px;
+  font-weight: bold;
+}
+
+.rank-row {
+  display: flex;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rank-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.rank-col {
+  flex: 1;
+  text-align: center;
+}
+
+.rank-empty, .brand-empty, .coop-empty {
+  padding: 40px;
+  text-align: center;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.brand-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+
+.brand-logo {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+.poster-footer {
+  text-align: center;
+  margin-top: 40px;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  padding-top: 30px;
+}
+
+.coop-brands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.coop-brand {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.poster-slogan {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.poster-logo {
+  font-size: 18px;
+  font-weight: bold;
+  opacity: 0.9;
+}
+
+.generate-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .poster-editor {
+    flex-direction: column;
+  }
+  
+  .poster-body {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .brand-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .poster-container {
+    padding: 20px;
+  }
+  
+  .poster-title {
+    font-size: 20px;
+  }
+  
+  .brand-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .poster-title {
+    font-size: 16px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+  }
+  
+  .rank-header, .rank-row {
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .brand-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
