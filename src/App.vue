@@ -407,7 +407,7 @@ const clearBgImage = () => {
 
 .poster-date {
   position: absolute;
-  top: 10px;
+  top: 40px;
   right: 20px;
   font-size: 14px;
   opacity: 0.9;
